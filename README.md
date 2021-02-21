@@ -1,4 +1,5 @@
 # OpenCTI Docker deployment
+This is a fork of this project. You will need to update the example files for the connenctions you want with the correct variables in order for this fork to work.
 
 OpenCTI can be deployed using the *docker-compose* command.
 
