@@ -1,16 +1,15 @@
-version: '3.4'
+version: "3.9"
 services:
   redis:
     image: redis:6.0.10
     restart: always
     env_file:
-      - .basic.env        
+      - .redis.env        
     volumes:
       - redisdata:/data
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: elasticsearch
     env_file:
       - .elasticsearch.env
     restart: always
@@ -23,6 +22,13 @@ services:
         hard: 65536
     ports:
       - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
   minio:
     image: minio/minio:RELEASE.2021-02-11T08-23-43Z
     volumes:
@@ -58,19 +64,18 @@ services:
       - rabbitmq
     restart: always
   worker:
-    image: opencti/worker:4.2.3
+    image: opencti/worker:rolling
     env_file:
       - .worker.env
     depends_on:
       - opencti
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 30
+      placement:
+        max_replicas_per_node: 10
     restart: always
-    deploy:
-      mode: replicated
-      replicas: 3
-    restart: always        
+   
   connector-history:
     image: opencti/connector-history:4.2.3
     depends_on:
